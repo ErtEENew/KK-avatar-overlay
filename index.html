@@ -38,7 +38,6 @@
       object-fit: contain;
     }
 
-    /* Debug UI to help you tune your mic sensitivity */
     #debug-ui {
       position: absolute;
       top: 10px;
@@ -82,7 +81,6 @@
 </head>
 <body>
 
-  <!-- Live Debug Menu for tuning -->
   <div id="debug-ui">
     <div>State: <span id="debug-state" style="color: #f1c40f;">resting</span></div>
     <div>Vol: <span id="debug-vol">0</span> / Thresh: <span id="debug-thresh">35</span></div>
@@ -92,19 +90,15 @@
     </div>
   </div>
 
-  <!-- The Avatar Container -->
   <div id="avatar-container">
     <img id="avatar" src="" alt="Reactive Avatar">
   </div>
 
   <script>
-    // ==========================================
-    // CONFIGURATION: SET YOUR GIF FILES HERE
-    // ==========================================
+
     const CONFIG = {
       usePlaceholders: false, 
       
-      // Change to false once you figure out your perfect volume threshold
       showDebugMenu: true, 
 
       files: {
@@ -121,14 +115,10 @@
         pushup:  'https://placehold.co/600x600/3498db/ffffff?text=Doing+Pushups...'
       },
 
-      // AUDIO SENSITIVITY TWEAKS
-      // If the avatar keeps talking when you are quiet, INCREASE this number.
       volumeThreshold: 35, 
       
-      // Makes the cut-off almost instant (50 milliseconds) when you stop talking.
       holdTimeMs: 50,     
 
-      // Idle Sequence Timing (Strict 10-second cycles)
       idleCycleTimeMs: 10000 
     };
 
@@ -139,7 +129,6 @@
     if (CONFIG.showDebugMenu) {
       document.getElementById('debug-ui').style.display = 'block';
       document.getElementById('debug-thresh').innerText = CONFIG.volumeThreshold;
-      // Position the red threshold line on the visual bar
       const threshPercent = Math.min((CONFIG.volumeThreshold / 100) * 100, 100);
       document.getElementById('thresh-line').style.left = threshPercent + '%';
     }
@@ -166,7 +155,6 @@
         if (this.currentState === newState) return;
         this.currentState = newState;
         
-        // Force replace the GIF instantly to cut off previous animations
         this.imgElement.src = ASSETS[newState];
 
         if (CONFIG.showDebugMenu) {
@@ -196,7 +184,6 @@
       processAudioFrame(volume) {
         const isLoud = volume > CONFIG.volumeThreshold;
 
-        // Update Debug UI Live
         if (CONFIG.showDebugMenu) {
           document.getElementById('debug-vol').innerText = Math.round(volume);
           const volPercent = Math.min((volume / 100) * 100, 100);
@@ -213,11 +200,10 @@
           
           if (this.currentState !== 'talking') {
             this.stopIdleCycle(); 
-            this.setState('talking'); // Instant cut to talking
+            this.setState('talking'); 
           }
         } else {
           if (this.currentState === 'talking' && !this.talkHoldTimer) {
-            // Cut back to resting almost instantly (50ms)
             this.talkHoldTimer = setTimeout(() => {
               this.startIdleCycle(); 
               this.talkHoldTimer = null;
@@ -248,7 +234,7 @@
           this.microphone = this.audioContext.createMediaStreamSource(stream);
           this.microphone.connect(this.analyser);
 
-          this.analyser.smoothingTimeConstant = 0.2; // Made much lower for instant reaction time
+          this.analyser.smoothingTimeConstant = 0.2; 
           this.analyser.fftSize = 256;
           this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
 
